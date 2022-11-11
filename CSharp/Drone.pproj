@@ -1,0 +1,9 @@
+<Project>
+<ProjectName>Drone</ProjectName>
+<InputFiles>
+	<PFile>./PSrc</PFile>
+    <PFile>./PTst</PFile>
+</InputFiles>
+<Target>CSharp</Target>
+<OutputDir>./PGenerated/</OutputDir>
+</Project>

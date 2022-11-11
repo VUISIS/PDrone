@@ -1,0 +1,1 @@
+fun xor_crypto(mavlink_message_t) : mavlink_message_t
