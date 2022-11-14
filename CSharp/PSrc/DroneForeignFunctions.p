@@ -1,1 +1,2 @@
-fun xor_crypto(mavlink_message_t) : mavlink_message_t
+fun XORCrypto(msg: seq[int]): seq[int];
+fun Sleep(msecs: int);
