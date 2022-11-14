@@ -1,1 +1,6 @@
 .DS_Store
+CSharp/obj
+CSharp/POutput
+CSharp/PGenerated
+CSharp/Test.cs
+CSharp/Drone.csproj

@@ -10,13 +10,13 @@ namespace PImplementation
         {
             PrtSeq crypt = new PrtSeq();
 
-            int key = Convert.ToInt('X');
+            int key = 'X' - '0';
 
-            foreach(int item in vals)
+            foreach(PrtInt item in vals)
             {
-                int out = item ^ key;
+                int enc = (int)item ^ key;
 
-                crypt.Insert(out);
+                crypt.Add((PrtInt)enc);
             }
 
             return crypt;

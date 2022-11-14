@@ -12,15 +12,15 @@ machine QGC
         {
             var decMsg: seq[int];
             decMsg = decrypt_message(msg);
-            if(decMsg[0] == msg_heartbeat)
+            if(decMsg[0] == (msg_heartbeat to int))
             {
                 print format ("Message Heartbeat {0}", msg[1]);
             }
-            else if(decMsg[0] == msg_sys_status)
+            else if(decMsg[0] == (msg_sys_status to int))
             {
                 print format ("Message System Status {0}", msg[1]);
             }
-            else if(decMsg[0] == msg_battery_status)
+            else if(decMsg[0] == (msg_battery_status to int))
             {
                 print format ("Message Battery Status {0}", msg[1]);
             }
@@ -33,23 +33,6 @@ machine QGC
         {
 
         }
-        on eMavlinkMessage do (msg: seq[int])
-        {
-            var decMsg: seq[int];
-            decMsg = decrypt_message(msg);
-            if(decMsg[0] == msg_heartbeat)
-            {
-                print format ("Message Heartbeat {0}", msg[1]);
-            }
-            else if(decMsg[0] == msg_sys_status)
-            {
-                print format ("Message System Status {0}", msg[1]);
-            }
-            else if(decMsg[0] == msg_battery_status)
-            {
-                print format ("Message Battery Status {0}", msg[1]);
-            }
-        }
     }
 
     fun encrypt_send_message(msg: seq[int])
@@ -59,7 +42,7 @@ machine QGC
         send ardu, eMavlinkMessage, encMsg;
     }
 
-    fun decrypt_message(msg: seq[int])
+    fun decrypt_message(msg: seq[int]): seq[int]
     {
         return XORCrypto(msg);
     }

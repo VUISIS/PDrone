@@ -20,14 +20,14 @@ machine Ardupilot
             var battery_status_message: seq[int];
             var system_status_message: seq[int];
 
-            heartbeat_message += (msg_heartbeat as int);
-            heartbeat_message += (1);
+            heartbeat_message += (0, msg_heartbeat to int);
+            heartbeat_message += (1, 1);
 
-            battery_status_message += (msg_battery_status as int);
-            battery_status_message += (2);
+            battery_status_message += (0, msg_battery_status to int);
+            battery_status_message += (1, 2);
 
-            system_status_message += (msg_sys_status as int);
-            system_status_message += (3);
+            system_status_message += (0, msg_sys_status to int);
+            system_status_message += (1, 3);
 
             encrypt_send_message(heartbeat_message);
             encrypt_send_message(system_status_message);
@@ -42,7 +42,7 @@ machine Ardupilot
         send qgc, eMavlinkMessage, encMsg;
     }
 
-    fun decrypt_message(msg: seq[int])
+    fun decrypt_message(msg: seq[int]): seq[int]
     {
         return XORCrypto(msg);
     }

@@ -3,6 +3,7 @@
 <InputFiles>
 	<PFile>./PSrc</PFile>
     <PFile>./PTst</PFile>
+    <PFile>./PSpec</PFile>
 </InputFiles>
 <Target>CSharp</Target>
 <OutputDir>./PGenerated/</OutputDir>
