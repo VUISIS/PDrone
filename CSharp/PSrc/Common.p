@@ -1,3 +1,5 @@
+event eMavlinkMessage : seq[int];
+
 fun encrypt_send_message(target: machine, msg: seq[int])
 {
     var encMsg: seq[int];

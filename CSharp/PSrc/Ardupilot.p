@@ -1,5 +1,3 @@
-event eMavlinkMessage : seq[int];
-
 machine Ardupilot
 {
     var qgc: QGC;
