@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using Plang.CSharpRuntime;
 using Plang.CSharpRuntime.Values;
@@ -10,13 +11,13 @@ namespace PImplementation
         {
             PrtSeq crypt = new PrtSeq();
 
-            int key = 'X' - '0';
+            char key = 'X';
 
-            foreach(PrtInt item in vals)
+            foreach(PrtInt val in vals)
             {
-                int enc = (int)item ^ key;
+                char v = Convert.ToChar((int)val);
 
-                crypt.Add((PrtInt)enc);
+                crypt.Add((PrtInt)Convert.ToInt32(v ^ key));
             }
 
             return crypt;
