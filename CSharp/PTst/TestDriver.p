@@ -1,13 +1,11 @@
 machine Drone
 {
-    var qgc: QGC;
-    var ardu: Ardupilot;
+    var uart: UART;
     start state Init 
     {
         entry 
         {
-            qgc = new QGC(ardu);
-            ardu = new Ardupilot(qgc);
+            uart = new UART();
         }
     }
 }

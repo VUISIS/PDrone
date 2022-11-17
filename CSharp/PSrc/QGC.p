@@ -1,27 +1,56 @@
 machine QGC
 {
-    var ardu: Ardupilot;
+    var hb_monitor: HeartbeatMonitor;
+    var uart: UART;
+    var connected: bool;
     start state Init 
     {
-        entry (controller: Ardupilot)
+        entry (serial: UART)
         {
-            ardu = controller;
-            goto Connected;
+            uart = serial;
+            hb_monitor = new HeartbeatMonitor();
+            connected = false;
+            goto Connect;
         }
     }
 
-    state Connected
+    state Connect
     {
-        entry
-        {
-            
-        }
         on eMavlinkMessage do (msg: seq[int])
         {
-            var decMsg: seq[int];
-            decMsg = decrypt_message(msg);
+            handle_messages(msg);
+            if(connected)
+            {
+                goto Run;
+            }
+        }
+    }
 
-            print format ("Message {0} {1}", decMsg[0], decMsg[1]);
+    state Run
+    {
+        on eMavlinkMessage do (msg: seq[int])
+        {
+            handle_messages(msg);
+        }
+    }
+
+    state Arm
+    {
+        ignore eMavlinkMessage;
+        entry
+        {
+
+        }
+    }
+
+    fun handle_messages(msg: seq[int])
+    {
+        var decMsg: seq[int];
+        decMsg = decrypt_validate_message(msg);
+        if(decMsg[0] == msg_heartbeat to int)
+        {
+            connected = true;
+            send hb_monitor, eHeartbeatMonitor, decMsg;
         }
     }
 }

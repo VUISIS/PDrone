@@ -1,11 +1,13 @@
 machine Ardupilot
 {
-    var qgc: QGC;
+    var uart: UART;
+    var timer: Timer;
     start state Init 
     {
-        entry (program: QGC)
+        entry (serial: UART)
         {
-            qgc = program;
+            uart = serial;
+            timer = CreateTimer(this);
             goto Run;
         }
     }
@@ -14,22 +16,22 @@ machine Ardupilot
     {
         entry
         {
-            var heartbeat_message: seq[int];
-            var battery_status_message: seq[int];
-            var system_status_message: seq[int];
+            StartTimer(timer);
+        }
+        on eTimeOut goto SendDefaultMessages;
+        on eMavlinkMessage do (msg: seq[int])
+        {
 
-            heartbeat_message += (0, msg_heartbeat to int);
-            heartbeat_message += (1, 1);
+        }
+    }
 
-            battery_status_message += (0, msg_battery_status to int);
-            battery_status_message += (1, 2);
-
-            system_status_message += (0, msg_sys_status to int);
-            system_status_message += (1, 3);
-
-            encrypt_send_message(qgc, heartbeat_message);
-            encrypt_send_message(qgc, battery_status_message);
-            encrypt_send_message(qgc, system_status_message);
+    state SendDefaultMessages
+    {
+        ignore eMavlinkMessage;
+        entry
+        {
+            send_heartbeat(uart, QGC);
+            goto Run;
         }
     }
 }
