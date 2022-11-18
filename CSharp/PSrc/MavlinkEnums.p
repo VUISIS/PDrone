@@ -258,14 +258,14 @@ enum mav_mode {
 }
 // 
 enum mav_state {
-    mav_state_uninit,
-    mav_state_boot,
-    mav_state_calibrating,
-    mav_state_standby,
-    mav_state_active,
-    mav_state_critical,
-    mav_state_emergency,
-    mav_state_poweroff
+    mav_state_uninit = 0,
+    mav_state_boot = 1,
+    mav_state_calibrating = 2,
+    mav_state_standby = 3,
+    mav_state_active = 4,
+    mav_state_critical = 5,
+    mav_state_emergency = 6,
+    mav_state_poweroff = 7
 }
 // 
 enum mav_component {
@@ -473,6 +473,7 @@ enum mav_cmd {
     mav_cmd_airframe_configuration = 2520,
     mav_cmd_panorama_create = 2800,
     mav_cmd_do_vtol_transition = 3000,
+    mav_cmd_arm_authorization_request = 3001,
     mav_cmd_set_guided_submode_standard = 4000,
     mav_cmd_set_guided_submode_circle = 4001,
     mav_cmd_payload_prepare_deploy = 30001,

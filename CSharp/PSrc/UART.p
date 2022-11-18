@@ -14,13 +14,13 @@ machine UART
 
     state Network
     {
-        on eUARTLink do (payload: (sys: System, msg: seq[int]))
+        on eUARTLink do (payload: (sys: system, msg: seq[int]))
         {
-            if(payload.sys == Ardupilot)
+            if(payload.sys == ardupilot)
             {
                 send ardu, eMavlinkMessage, payload.msg;
             }
-            else if(payload.sys == QGC)
+            else if(payload.sys == qgroundcontrol)
             {
                 send qgc, eMavlinkMessage, payload.msg;
             }
