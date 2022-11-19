@@ -9,3 +9,15 @@ machine Drone
         }
     }
 }
+
+machine UnstableDrone
+{
+    var uart: UnstableUART;
+    start state Init 
+    {
+        entry 
+        {
+            uart = new UnstableUART();
+        }
+    }
+}

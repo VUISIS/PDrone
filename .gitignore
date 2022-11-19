@@ -4,3 +4,5 @@ CSharp/POutput
 CSharp/PGenerated
 CSharp/Test.cs
 CSharp/Drone.csproj
+CSharp/.DS_Store
+.vscode

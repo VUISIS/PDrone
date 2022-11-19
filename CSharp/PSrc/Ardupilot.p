@@ -1,19 +1,16 @@
 machine Ardupilot
 {
-    var uart: UART;
-    var timer: Timer;
+    var uart: machine;
     var hbpayload: tHBPayload;
     start state Init 
     {
-        entry (serial: UART)
+        entry (serial: machine)
         {
             uart = serial;
             hbpayload = (mtype = mav_type_fixed_wing, 
                          mautopilot = mav_autopilot_ardupilotmega,
                          mmode = mav_mode_auto_disarmed,
                          mstate = mav_state_active);
-            timer = CreateTimer(this);
-            StartTimer(timer);
             goto Run;
         }
     }
@@ -22,13 +19,15 @@ machine Ardupilot
     {
         entry
         {
-
+            send_default_messages();
         }
-        on eTimeOut goto SendDefaultMessages;
+        on eError do (flag: error)
+        {
+            handle_error(flag);
+        }
         on eMavlinkMessage do (msg: seq[int])
         {
             handle_messages(msg);
-            goto Run;
         }
     }
 
@@ -36,13 +35,15 @@ machine Ardupilot
     {
         entry
         {
-
+            send_default_messages();
         }
-        on eTimeOut goto SendDefaultMessages;
+        on eError do (flag: error)
+        {
+            handle_error(flag);
+        }
         on eMavlinkMessage do (msg: seq[int])
         {
             handle_messages(msg);
-            goto Armed;
         }
     }
 
@@ -50,59 +51,114 @@ machine Ardupilot
     {
         entry
         {
-
+            send_default_messages();
         }
-        on eTimeOut goto SendDefaultMessages;
+        on eError do (flag: error)
+        {
+            handle_error(flag);
+        }
         on eMavlinkMessage do (msg: seq[int])
         {
             handle_messages(msg);
-            goto Takeoff;
         }
     }
 
-    state SendDefaultMessages
+    state Mission
     {
-        ignore eMavlinkMessage, eTimeOut;
         entry
         {
-            send_heartbeat(uart, qgroundcontrol, hbpayload);
-            send_system_status(uart, qgroundcontrol);
-            goto Run;
+            send_default_messages();
         }
+        on eError do (flag: error)
+        {
+            handle_error(flag);
+        }
+        on eMavlinkMessage do (msg: seq[int])
+        {
+            handle_messages(msg);
+        }
+    }
+
+    state Land
+    {
+        entry
+        {
+            send_default_messages();
+        }
+        on eError do (flag: error)
+        {
+            handle_error(flag);
+        }
+        on eMavlinkMessage do (msg: seq[int])
+        {
+            handle_messages(msg);
+        }
+    }
+
+    state Shutdown
+    {
+        ignore eError, eMavlinkMessage;
+        entry
+        {
+            raise halt;
+        }
+    }
+
+    fun send_default_messages()
+    {
+        send_heartbeat(uart, qgroundcontrol, hbpayload);
+        send_system_status(uart, qgroundcontrol);
     }
 
     fun handle_messages(msg: seq[int])
     {
         var decMsg: seq[int];
-        var capayload: tCAPayload;
         decMsg = decrypt_validate_message(msg);
-        if(decMsg[0] == msg_command_long to int)
+        if(decMsg[0] == -1)
         {
-            if(decMsg[1] == mav_cmd_do_set_mode to int)
-            {
-                capayload = (mcmd = mav_cmd_do_set_mode, mresult = mav_result_accepted);
-                send_command_ack(uart, qgroundcontrol, capayload);
-                check_and_set_hbpayload(decMsg[2]);
-                if(hbpayload.mmode == mav_mode_auto_armed)
-                {
-                    goto Armed;
-                }
-            }
-            else if(decMsg[2] == mav_cmd_nav_takeoff to int)
-            {
-                capayload = (mcmd = mav_cmd_nav_takeoff, mresult = mav_result_accepted);
-                send_command_ack(uart, qgroundcontrol, capayload);
-
-                goto Takeoff;
-            }
+            raise eError, checksum_error;
+        }
+        else if(decMsg[0] == msg_mission_request to int)
+        {
+            send_mission_current(uart, qgroundcontrol, mav_mission_state_complete);
+        }
+        else if(decMsg[0] == msg_command_long to int)
+        {
+            handle_long_command(decMsg);
         }
     }
 
-    fun check_and_set_hbpayload(num: int)
+    fun handle_long_command(msg: seq[int])
     {
-        if(num == 220)
+        var capayload: tCAPayload;
+        if(msg[1] == mav_cmd_do_set_mode to int)
         {
             hbpayload.mmode = mav_mode_auto_armed;
+            capayload = (mcmd = mav_cmd_do_set_mode, mresult = mav_result_accepted);
+            send_command_ack(uart, qgroundcontrol, capayload);
+            goto Armed;
+        }
+        if(msg[1] == mav_cmd_nav_takeoff to int)
+        {
+            capayload = (mcmd = mav_cmd_nav_takeoff, mresult = mav_result_accepted);
+            send_command_ack(uart, qgroundcontrol, capayload);
+            goto Takeoff;
+        }
+        if(msg[1] == mav_cmd_nav_land to int)
+        {
+            capayload = (mcmd = mav_cmd_nav_land, mresult = mav_result_accepted);
+            send_command_ack(uart, qgroundcontrol, capayload);
+            goto Land;
+        }
+        if(msg[1] == mav_cmd_preflight_reboot_shutdown to int)
+        {
+            goto Shutdown;
+        }
+        if(msg[1] == mav_cmd_mission_start to int)
+        {
+            capayload = (mcmd = mav_cmd_mission_start, mresult = mav_result_accepted);
+            send_command_ack(uart, qgroundcontrol, capayload);
+            goto Mission;
         }
     }
 }

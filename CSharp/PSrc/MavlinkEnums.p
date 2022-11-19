@@ -566,6 +566,14 @@ enum mav_mission_result {
     mav_mission_invalid_sequence = 13,
     mav_mission_denied = 14
 }
+enum mav_mission_state {
+    mav_mission_state_unknown = 0,
+    mav_mission_state_no_mission = 1,
+    mav_mission_not_started = 2,
+    mav_mission_state_active = 3,
+    mav_mission_state_paused = 4,
+    mav_mission_state_complete = 5
+}
 // Indicates the severity level, generally used for status messages to indicate their relative urgency. Based on RFC-5424 using expanded definitions at: http://www.kiwisyslog.com/kb/info:-syslog-message-levels/.
 enum mav_severity {
     mav_severity_emergency = 0,

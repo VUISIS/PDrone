@@ -1,2 +1,5 @@
-test CheckArdupilotState [main = Drone] : 
-        assert ArdupilotOperation in union { Drone }, QGC, Ardupilot, UART, Timer;
+test ValidateNetwork [main = Drone] : 
+        assert MavlinkChecksum in union { Drone }, Network;
+
+test FaultyNetwork [main = UnstableDrone] : 
+        assert MavlinkChecksum in union { UnstableDrone }, UnstableNetwork;

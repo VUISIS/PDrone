@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using System.Timers;
 using Plang.CSharpRuntime;
 using Plang.CSharpRuntime.Values;
 
